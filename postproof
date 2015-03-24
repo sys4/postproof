@@ -1,13 +1,13 @@
 #!/bin/bash
 # Copyright (C) 2015 sys4 AG
 #
-# project     : 
+# project     :
 # file        : /usr/local/sbin/postproof
 # date        : 19.01.2015
 # created by  : jz@sys4.de
-# modified at : 
-# modified by : 
-# description : 
+# modified at :
+# modified by :
+# description :
 #
 
 #- locales
@@ -19,21 +19,13 @@ test $(id -u) -ne 0 && echo "This program requires root privileges" && exit
 #- test for binaries
 RETVAL=0
 MESS=''
-test -x $(which postqueue) || RETVAL=1 && MESS='command postqueue not found'
-test -x $(which postsuper) || RETVAL=1 && MESS='command postsuper not found'
-test -x $(which postcat) || RETVAL=1 && MESS='command postcat not found'
-test -x $(which gpg) || RETVAL=1 && MESS='command gpg not found'
-test -x $(which date) || RETVAL=1 && MESS='command date not found'
-test -x $(which mkdir) || RETVAL=1 && MESS='command mkdir not found'
-test -x $(which md5sum) || RETVAL=1 && MESS='command md5 not found'
-test -x $(which sha1sum) || RETVAL=1 && MESS='command sha1 not found'
-test -x $(which sha256sum) || RETVAL=1 && MESS='command sha256 not found'
-test -x $(which grep) || RETVAL=1 && MESS='command grep not found'
-test -x $(which hostname) || RETVAL=1 && MESS='command hostname not found'
-test -x $(which bzip2) || RETVAL=1 && MESS='command bzip2 not found'
-test -x $(which gzip) || RETVAL=1 && MESS='command gzip not found'
-test -x $(which find) || RETVAL=1 && MESS='command find not found'
-test -x $(which tar) || RETVAL=1 && MESS='command tar not found'
+for bin in postqueue postsuper postcat gpg date mkdir md5sum sha1sum sha256sum grep hostname bzip2 gzip find tar; do
+  test -x "$(which ${bin})"
+  if [[ $? -ne 0 ]]; then
+    RETVAL=1
+    MESS="command ${bin} not found"
+  fi
+done
 #- editor
 test -n "$EDITOR" && test -x $(which $EDITOR) && _editor=$EDITOR
 test -z $_editor && _editor=vi
@@ -65,7 +57,7 @@ _postcat="postcat"
 _tar='tar cf'
 
 
-##- help 
+##- help
 function helper ()
 {
   if [ "${RETVAL}" -ne 0 ]
@@ -138,7 +130,7 @@ function report()
   #- create hash for every file
   MESS="build checksums for queue_id: ${QUEUE_ID}"; logger
   _pwd=$(pwd)
-  cd "${BASE_DIR}" 
+  cd "${BASE_DIR}"
   files=$(find ${DIR_NAME} -type f)
   for file in $files
   do
@@ -158,7 +150,7 @@ function report()
   sha1=$(echo $files | sha1sum)
   sha256=$(echo $files | sha256sum)
   echo "md5 ${QUEUE_ID} ${md5}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum"
-  echo "sha1 ${QUEUE_ID} ${sha1}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum" 
+  echo "sha1 ${QUEUE_ID} ${sha1}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum"
   echo "sha256 ${QUEUE_ID} ${sha256}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum"
 
   #- do backup
@@ -303,7 +295,7 @@ do
   test -n "${QUEUE_IDS}" && test -z $DIR_NAME && test "$SPLITT" -eq 0 && get_dir_name
 
   #- multiple directories
-  test -n "${QUEUE_IDS}" && test "$SPLITT" -eq 1 && COUNT_QUEUE_ID=0 && get_dir_name  
+  test -n "${QUEUE_IDS}" && test "$SPLITT" -eq 1 && COUNT_QUEUE_ID=0 && get_dir_name
 
   logger
   test -n "${QUEUE_IDS}" && MESS="found mails from $from"; logger
