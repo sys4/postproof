@@ -14,7 +14,7 @@
 export LANG=POSIX
 
 #- root privileges required
-test $(id -u) -ne 0 && echo "This program requires root privileges" && exit
+test "$(id -u)" -ne 0 && echo "This program requires root privileges" && exit
 
 #- test for binaries
 RETVAL=0
@@ -27,9 +27,9 @@ for bin in postqueue postsuper postcat gpg date mkdir md5sum sha1sum sha256sum g
   fi
 done
 #- editor
-test -n "$EDITOR" && test -x $(which $EDITOR) && _editor=$EDITOR
-test -z $_editor && _editor=vi
-test -x $(which $_editor) || RETVAL=1 && MESS="command $_editor not found"
+test -n "$EDITOR" && test -x "$(which "${EDITOR}")" && _editor=$EDITOR
+test -z "$_editor" && _editor=vi
+test -x "$(which $_editor)" || RETVAL=1 && MESS="command $_editor not found"
 
 
 #- some vars
@@ -38,7 +38,7 @@ FQDN=$(hostname -f)
 BASE_DIR='/var/lib/postproof'
 PROT_FILE='protocol.txt'
 INCIDENT_FILE='incident.txt'
-PRG=$(basename $0)
+PRG=$(basename "$0")
 CONFIG_DIR=''
 COMPRESSOR=''
 INCIDENT=''
@@ -47,7 +47,6 @@ PURGE=0
 SPLITT=0
 VERBOSE=0
 RECIPIENT=''
-FULLMESS=''
 SENDER='root'
 DO=0
 # binaries
@@ -85,8 +84,8 @@ function helper ()
 ##- logger, log messages
 function logger()
 {
-  echo $MESS >> "${BASE_DIR}/${DIR_NAME}/${PROT_FILE}"
-  test "${VERBOSE}" -eq 1 && echo $MESS
+  echo "${MESS}" >> "${BASE_DIR}/${DIR_NAME}/${PROT_FILE}"
+  test "${VERBOSE}" -eq 1 && echo "${MESS}"
 }
 
 
@@ -96,20 +95,20 @@ function abuse()
   DO=1
   #- stop mail
   MESS="stop delivering mail, queue_id: ${QUEUE_ID} "; logger
-  $_postsuper -h $QUEUE_ID > /dev/null 2>&1
+  $_postsuper -h "${QUEUE_ID}" > /dev/null 2>&1
 
   #- save queue
   MESS="save queue_id: ${QUEUE_ID}"; logger
-  $_postcat -q $QUEUE_ID > ${BASE_DIR}/${DIR_NAME}/raw/${QUEUE_ID}
+  $_postcat -q "${QUEUE_ID}" > "${BASE_DIR}/${DIR_NAME}/raw/${QUEUE_ID}"
 
   #- save message in maildir format
   MESS="save mail to ${BASE_DIR}/${DIR_NAME}/messages/new/${START}.${FQDN}.${QUEUE_ID}.msg (maildir format)"; logger
-  $_postcat -h -q $QUEUE_ID > ${BASE_DIR}/${DIR_NAME}/messages/new/${START}.${FQDN}.${QUEUE_ID}.msg
-  $_postcat -b -q $QUEUE_ID >> ${BASE_DIR}/${DIR_NAME}/messages/new/${START}.${FQDN}.${QUEUE_ID}.msg
+  $_postcat -h -q "${QUEUE_ID}" > "${BASE_DIR}/${DIR_NAME}/messages/new/${START}.${FQDN}.${QUEUE_ID}.msg"
+  $_postcat -b -q "${QUEUE_ID}" >> "${BASE_DIR}/${DIR_NAME}/messages/new/${START}.${FQDN}.${QUEUE_ID}.msg"
 
   #- delete mail
   test "${PURGE}" -eq 1 && MESS="delete mail with queue_id ${QUEUE_ID}"; logger
-  test "${PURGE}" -eq 1 && $_postsuper -d $QUEUE_ID
+  test "${PURGE}" -eq 1 && $_postsuper -d "${QUEUE_ID}"
   MESS=''; logger
 }
 
@@ -131,24 +130,24 @@ function report()
   MESS="build checksums for queue_id: ${QUEUE_ID}"; logger
   _pwd=$(pwd)
   cd "${BASE_DIR}"
-  files=$(find ${DIR_NAME} -type f)
+  files=$(find "${DIR_NAME}" -type f)
   for file in $files
   do
     echo -n "md5 " >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
-    md5sum $file  >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
+    md5sum "${file}"  >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
     echo -n "sha1 " >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
-    sha1sum $file  >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
+    sha1sum "${file}"  >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
     echo -n "sha256 " >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
-    sha256sum $file  >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
+    sha256sum "${file}"  >> "${BASE_DIR}/${DIR_NAME}/integrity.txt"
   done
 
   #- create hash for directory
   MESS="build directory checksums for queue_id: ${QUEUE_ID}"; logger
   files=$(find "${DIR_NAME}" -ls)
   cd "${_pwd}"
-  md5=$(echo $files | md5sum)
-  sha1=$(echo $files | sha1sum)
-  sha256=$(echo $files | sha256sum)
+  md5=$(echo "${files}" | md5sum)
+  sha1=$(echo "${files}" | sha1sum)
+  sha256=$(echo "${files}" | sha256sum)
   echo "md5 ${QUEUE_ID} ${md5}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum"
   echo "sha1 ${QUEUE_ID} ${sha1}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum"
   echo "sha256 ${QUEUE_ID} ${sha256}" >> "${BASE_DIR}/integrity/${DIR_NAME}.chksum"
@@ -205,9 +204,9 @@ test "$RETVAL" -ne 0 && helper
 while getopts ":c:hjm:Mo:pn:svz" opt; do
   case $opt in
     c)
-      test -z $OPTARG && MESS="option -c require a valid config directory" && RETVAL=2 && helper
-      ! test -d $OPTARG && MESS="$OPTARG is no valid config directory" && RETVAL=2 && helper
-      CONFIG_DIR=$OPTARG
+      test -z "${OPTARG}" && MESS="option -c require a valid config directory" && RETVAL=2 && helper
+      ! test -d "${OPTARG}" && MESS="${OPTARG} is no valid config directory" && RETVAL=2 && helper
+      CONFIG_DIR="${OPTARG}"
       ;;
     h)
       helper
@@ -242,10 +241,10 @@ while getopts ":c:hjm:Mo:pn:svz" opt; do
       VERBOSE=1
       ;;
     :)
-      test $OPTARG == 'c' && MESS="option -c require a valid config directory" && RETVAL=2 && helper
-      test $OPTARG == 'o' && MESS="option -o require a valid output directory" && RETVAL=2 && helper
-      test $OPTARG == 'r' && MESS="option -r require a valid recipient" && RETVAL=2 && helper
-      test $OPTARG == 'm' && MESS="option -m require a incident decription" && RETVAL=2 && helper
+      test "$OPTARG" == 'c' && MESS="option -c require a valid config directory" && RETVAL=2 && helper
+      test "$OPTARG" == 'o' && MESS="option -o require a valid output directory" && RETVAL=2 && helper
+      test "$OPTARG" == 'r' && MESS="option -r require a valid recipient" && RETVAL=2 && helper
+      test "$OPTARG" == 'm' && MESS="option -m require a incident decription" && RETVAL=2 && helper
       ;;
     *)
       MESS="unknown option -${OPTARG}" && RETVAL=2 && helper
@@ -261,8 +260,8 @@ test $# -eq 0 && MESS="no envelope-sender" && RETVAL=3 && helper
 test -n "$CONFIG_DIR" && _postqueue="postqueue -c $CONFIG_DIR" && _postsuper="postsuper -c $CONFIG_DIR" && _postcat="postcat -c $CONFIG_DIR"
 
 #- working directory
-test -e $BASE_DIR && ! test -d $BASE_DIR && MESS="name $BASE_DIR is a file, not a directory" && RETVAL=3 && helper
-test -d $BASE_DIR || mkdir -p "${BASE_DIR}"
+test -e "${BASE_DIR}" && ! test -d "${BASE_DIR}" && MESS="name ${BASE_DIR} is a file, not a directory" && RETVAL=3 && helper
+test -d "${BASE_DIR}" || mkdir -p "${BASE_DIR}"
 test $? -ne 0 && MESS="could not create output directory ${BASE_DIR}" && RETVAL=3 && helper
 #- integrity directory
 test -e "${BASE_DIR}/integrity" && ! test -d "${BASE_DIR}/integrity" && MESS="name ${BASE_DIR}/integrity is a file, not a directory" && RETVAL=3 && helper
@@ -281,9 +280,9 @@ DIR_NAME=''
 COUNT_FROM=0
 COUNT_QUEUE_ID=0
 ALL_INCIDENT=''
-for from in $@
+for from in "$@"
 do
-  COUNT_FROM=$(($COUNT_FROM + 1))
+  COUNT_FROM=$((COUNT_FROM + 1))
   #- log
   test "${SPLITT}" -ne 0 && get_dir_name
   MESS="searching for $from"
@@ -292,10 +291,10 @@ do
   QUEUE_IDS=$($_postqueue -p | grep -E " $from$" | grep -v '!' | cut -f1 -d' ')
 
   #- found envelope_from
-  test -n "${QUEUE_IDS}" && test -z $DIR_NAME && test "$SPLITT" -eq 0 && get_dir_name
+  test -n "${QUEUE_IDS}" && test -z ${DIR_NAME} && test "${SPLITT}" -eq 0 && get_dir_name
 
   #- multiple directories
-  test -n "${QUEUE_IDS}" && test "$SPLITT" -eq 1 && COUNT_QUEUE_ID=0 && get_dir_name
+  test -n "${QUEUE_IDS}" && test "${SPLITT}" -eq 1 && COUNT_QUEUE_ID=0 && get_dir_name
 
   logger
   test -n "${QUEUE_IDS}" && MESS="found mails from $from"; logger
@@ -304,9 +303,8 @@ do
   #- for every envelope from
   for QUEUE_ID in $QUEUE_IDS
   do
-    RUNME=1
     QUEUE_ID=${QUEUE_ID%\*}
-    COUNT_QUEUE_ID=$(($COUNT_QUEUE_ID + 1))
+    COUNT_QUEUE_ID=$((COUNT_QUEUE_ID + 1))
     ALL_INCIDENT="${ALL_INCIDENT}sender: ${from} with queue id: ${QUEUE_ID}
 "
     abuse
