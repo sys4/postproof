@@ -1,0 +1,89 @@
+postproof(1)
+============
+:doctype: manpage
+:man source:   postproof
+:man version:  0.1
+:man manual:   postproof Manual
+
+
+NAME
+----
+postproof - collect messages from a Postfix mail queue and preserve them as incident
+
+
+SYNOPSIS
+--------
+*postproof* ['-m <msg>'] ['-M'] ['-j'] ['-z'] ['-p'] ['-c <config_dir>'] ['-s'] ['-v'] ['-h'] ['-o <out_dir>'] ['-n <recipient>'] 'envelope-sender' [ 'envelope-sender']
+
+
+DESCRIPTION
+-----------
+
+postproof is a tool to retrieve and preserve messages from a postfix mail queue. It was created as a tool to preserve evidence after abuse incidents.
+
+Given a whitespace separated list of one or more envelope-sender addresses postproof will search a Postfix queue for all messages from these senders. It will move all identified messages into Postfix' HOLD queue.
+
+It will create an incident directory and start preserving evidence. For each message it will preserve a copy of its raw queue file, containing delivery information and message. Postproof will also store all messages into a maildir style directory for later inspection e.g. by a MUA. Finally it will create checksums of all files and write them to a separate file.
+
+
+OPTIONS
+-------
+
+*-m <msg>* (optional)::
+    Specifies a message on command line. The message will be written to a file named 'incident.txt' within the incident directory.
+    
+*-M* (optional)::
+    Invoke $EDITOR in order to create a message describing the incident. The message will be written to a file named 'incident.txt' within the incident directory.
+
+*-j* (optional)::
+    Specifies to archive the incident using bzip2.
+
+*-z* (optional)::
+    Specifies to archive the incident using gzip.
+
+*-p* (optional)::
+    Specifies to purge each identified message from Postfix' HOLD queue after it has been preserved.
+
+*-c <config_dir>* (default: '/etc/postfix')::
+    Specifies to use <config_dir> to identify the corresponding Postfix queue. All postproof actions will be acted upon messages in that queue. This option is useful for Postfix multiple instance setups.
+
+*-s* (optional)::
+    Specifies to store messages grouped by envelope-sender. Postproof will create a subdirectory for each envelope-sender. This option is useful only in combination if multiple envelope-senders have been given to postproof.
+
+*-v* (optional)::
+    Print verbose output during operation.
+
+*-h* (optional)::
+    Print a help message including short explanations for command line options.
+
+*-o <out_dir>* (optional)::
+    Specifies a directory 'out_dir' name to which all incident data should be written. If not specified postproof will create a directory made from a timestamp and a random string e.g. '2015-02-02_21:56:19.1422910579.c1m9'.
+    
+*-n <recipient>* (optional)::
+    Specifies an envelope-recipient to whom an incident notification should be sent.
+
+
+BUGS
+----
+
+Please submit BUGS to <https://github.com/sys4/postproof/issues>.
+
+
+AUTHOR
+------
+
+Jörg Zimmermann <jz@sys4.de> wrote the program. Patrick Ben Koetter <p@sys4.de> wrote this man page.
+
+
+RESOURCES
+---------
+
+postproofs's home is at <https://github.com/sys4/postproof>.
+
+
+COPYING
+-------
+
+Copyright \(C) 2015 sys4 AG. Free use of this software is granted under the terms of the GNU General Public License (GPL).
+
+// vim: set ft=asciidoc:

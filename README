@@ -1,0 +1,7 @@
+# postproof
+
+Postproof is an mail abuse incident tool. It searches a Postfix mail queue for messages from a particular sender, puts them into the HOLD queue, preserves the messages for forensic reports and (optionally) deletes the messages afterwards.
+
+Read postproof(1) for all the details.
+
+

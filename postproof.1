@@ -1,0 +1,116 @@
+'\" t
+.\"     Title: postproof
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 03/24/2015
+.\"    Manual: postproof Manual
+.\"    Source: postproof 0.1
+.\"  Language: English
+.\"
+.TH "POSTPROOF" "1" "03/24/2015" "postproof 0\&.1" "postproof Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+postproof \- collect messages from a Postfix mail queue and preserve them as incident
+.SH "SYNOPSIS"
+.sp
+\fBpostproof\fR [\fI\-m <msg>\fR] [\fI\-M\fR] [\fI\-j\fR] [\fI\-z\fR] [\fI\-p\fR] [\fI\-c <config_dir>\fR] [\fI\-s\fR] [\fI\-v\fR] [\fI\-h\fR] [\fI\-o <out_dir>\fR] [\fI\-n <recipient>\fR] \fIenvelope\-sender\fR [ \fIenvelope\-sender\fR]
+.SH "DESCRIPTION"
+.sp
+postproof is a tool to retrieve and preserve messages from a postfix mail queue\&. It was created as a tool to preserve evidence after abuse incidents\&.
+.sp
+Given a whitespace separated list of one or more envelope\-sender addresses postproof will search a Postfix queue for all messages from these senders\&. It will move all identified messages into Postfix\*(Aq HOLD queue\&.
+.sp
+It will create an incident directory and start preserving evidence\&. For each message it will preserve a copy of its raw queue file, containing delivery information and message\&. Postproof will also store all messages into a maildir style directory for later inspection e\&.g\&. by a MUA\&. Finally it will create checksums of all files and write them to a separate file\&.
+.SH "OPTIONS"
+.PP
+\fB\-m <msg>\fR (optional)
+.RS 4
+Specifies a message on command line\&. The message will be written to a file named
+\fIincident\&.txt\fR
+within the incident directory\&.
+.RE
+.PP
+\fB\-M\fR (optional)
+.RS 4
+Invoke $EDITOR in order to create a message describing the incident\&. The message will be written to a file named
+\fIincident\&.txt\fR
+within the incident directory\&.
+.RE
+.PP
+\fB\-j\fR (optional)
+.RS 4
+Specifies to archive the incident using bzip2\&.
+.RE
+.PP
+\fB\-z\fR (optional)
+.RS 4
+Specifies to archive the incident using gzip\&.
+.RE
+.PP
+\fB\-p\fR (optional)
+.RS 4
+Specifies to purge each identified message from Postfix\*(Aq HOLD queue after it has been preserved\&.
+.RE
+.PP
+\fB\-c <config_dir>\fR (default: \fI/etc/postfix\fR)
+.RS 4
+Specifies to use <config_dir> to identify the corresponding Postfix queue\&. All postproof actions will be acted upon messages in that queue\&. This option is useful for Postfix multiple instance setups\&.
+.RE
+.PP
+\fB\-s\fR (optional)
+.RS 4
+Specifies to store messages grouped by envelope\-sender\&. Postproof will create a subdirectory for each envelope\-sender\&. This option is useful only in combination if multiple envelope\-senders have been given to postproof\&.
+.RE
+.PP
+\fB\-v\fR (optional)
+.RS 4
+Print verbose output during operation\&.
+.RE
+.PP
+\fB\-h\fR (optional)
+.RS 4
+Print a help message including short explanations for command line options\&.
+.RE
+.PP
+\fB\-o <out_dir>\fR (optional)
+.RS 4
+Specifies a directory
+\fIout_dir\fR
+name to which all incident data should be written\&. If not specified postproof will create a directory made from a timestamp and a random string e\&.g\&.
+\fI2015\-02\-02_21:56:19\&.1422910579\&.c1m9\fR\&.
+.RE
+.PP
+\fB\-n <recipient>\fR (optional)
+.RS 4
+Specifies an envelope\-recipient to whom an incident notification should be sent\&.
+.RE
+.SH "BUGS"
+.sp
+Please submit BUGS to https://github\&.com/sys4/postproof/issues\&.
+.SH "AUTHOR"
+.sp
+Jörg Zimmermann <jz@sys4\&.de> wrote the program\&. Patrick Ben Koetter <p@sys4\&.de> wrote this man page\&.
+.SH "RESOURCES"
+.sp
+postproofs\(cqs home is at https://github\&.com/sys4/postproof\&.
+.SH "COPYING"
+.sp
+Copyright (C) 2015 sys4 AG\&. Free use of this software is granted under the terms of the GNU General Public License (GPL)\&.
