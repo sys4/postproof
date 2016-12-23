@@ -20,8 +20,7 @@ test "$(id -u)" -ne 0 && echo "This program requires root privileges" && exit
 RETVAL=0
 MESS=''
 for bin in postqueue postsuper postcat gpg date mkdir md5sum sha1sum sha256sum grep hostname bzip2 gzip find tar; do
-  test -x "$(which ${bin})"
-  if [[ $? -ne 0 ]]; then
+  if ! [ -x "$(which ${bin})" ]; then
     RETVAL=1
     MESS="command ${bin} not found"
   fi
